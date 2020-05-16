@@ -3,6 +3,8 @@ from requests.exceptions import RequestException
 from contextlib import closing
 from bs4 import BeautifulSoup
 
+import json
+
 class Dam:
     def __init__(self, name, date1, time1, water_level1, date2, time2, water_level2, difference, nhwl):
         self.name = name
@@ -13,7 +15,10 @@ class Dam:
         self.time2 = time2
         self.water_level2 = water_level2
         self.difference = difference
-        self.nhwl = nhwl
+        self.nhwl = nhwl 
+
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
 
 def process_dam_info(name, details):
     # date today
@@ -38,12 +43,16 @@ def process_dam_info(name, details):
     return dam
 
 def print_dam_info(dam):
-    print(dam.name)
-    print(dam.date1, dam.time1)
-    print("Water Level (m):", dam.water_level1)
-    print(dam.date2, dam.time2)
-    print("Water Level (m):", dam.water_level2)
-    print("Difference:", "{:.2f}".format(dam.difference), "\n")
+    damJSONData = json.dumps(dam.toJson(), indent=4)
+    print(json.loads(damJSONData))
+    
+    # for printing in console not using JSON
+    # print(dam.name)
+    # print(dam.date1, dam.time1)
+    # print("Water Level (m):", dam.water_level1)
+    # print(dam.date2, dam.time2)
+    # print("Water Level (m):", dam.water_level2)
+    # print("Difference:", "{:.2f}".format(dam.difference), "\n")
 
 r = get('http://bagong.pagasa.dost.gov.ph/flood')
 soup = BeautifulSoup(r.text, features="html.parser")
